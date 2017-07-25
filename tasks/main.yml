@@ -11,18 +11,13 @@
     dest: "/tmp"
     remote_src: yes
 
-- name: Configure samtools
-  command: "./configure --prefix=/usr/local"
-  args:
-    chdir: "/tmp/lastz-distrib-{{ VERSION }}"
-
 - name: Build executables from source
   make:
-    chdir: "/tmp/lastz-distrib-{{ VERSION }}"
+    chdir: "/tmp/lastz-distrib-{{ VERSION }}/src"
 
 - name: Install executables
   make:
-    chdir: "/tmp/lastz-distrib-{{ VERSION }}"
+    chdir: "/tmp/lastz-distrib-{{ VERSION }}/src"
     target: install
 
 - name: Move executable files to path
