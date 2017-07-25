@@ -1,0 +1,44 @@
+---
+
+- name: Download zip
+  get_url:
+    url: "http://www.bx.psu.edu/~rsharris/lastz/lastz-{{ VERSION }}.tar.gz"
+    dest: "/tmp/lastz.tar.gz"
+
+- name: Unzip the package
+  unarchive:
+    src: "/tmp/lastz.tar.gz"
+    dest: "/tmp"
+    remote_src: yes
+
+- name: Configure samtools
+  command: "./configure --prefix=/usr/local"
+  args:
+    chdir: "/tmp/lastz-distrib-{{ VERSION }}"
+
+- name: Build executables from source
+  make:
+    chdir: "/tmp/lastz-distrib-{{ VERSION }}"
+
+- name: Install executables
+  make:
+    chdir: "/tmp/lastz-distrib-{{ VERSION }}"
+    target: install
+
+- name: Move executable files to path
+  copy:
+    remote_src: yes
+    src: "/tmp/lastz-distrib-{{ VERSION }}/bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    mode: 0755
+  with_items:
+    - "lastz"
+    - "lastz_D"
+
+- name: Remove temporary files
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items:
+    - "/tmp/lastz.tar.gz"
+    - "/tmp/lastz-distrib-{{ VERSION }}"
